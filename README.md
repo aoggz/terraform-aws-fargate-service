@@ -2,14 +2,7 @@
 
 Terraform module for a load balanced ECS Service using the Fargate launch type.
 
-## TODO
-
-- Create a simple pipeline to deploy to S3
-- Open source?
-  - Move repo to GitHub
-  - Publish to Terraform registry
-
-This module will create the following:
+It will create the following:
 
 - Application Load Balancer in the subnets you specify:
   - `alb_subnets_private` if `alb_internal = true`
