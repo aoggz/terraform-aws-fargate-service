@@ -24,7 +24,8 @@ It will create the following:
 
 ```hcl
 module "cool-module-name-here" {
-  source = "s3::https://s3.amazonaws.com/zlv-hm-tf-modules/lb-fargate-service.zip"
+  source =  "aoggz/fargate-service/aws"
+  version = "1.0.0"
 
   resource_prefix          = "${local.resource_prefix}"
   ecs_cluster_id           = "${var.ecs_cluster_id}"
