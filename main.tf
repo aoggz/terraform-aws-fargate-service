@@ -190,9 +190,9 @@ module "datadog" {
 
   name                     = "datadog-agent"
   family                   = "datadog-agent"
-  cpu                      = "64"
+  cpu                      = "${var.datadog_cpu}"
   image                    = "datadog/agent:latest"
-  memory                   = "64"
+  memory                   = "${var.datadog_memory}"
   essential                = false
   register_task_definition = false
 
