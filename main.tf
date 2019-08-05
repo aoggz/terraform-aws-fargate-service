@@ -217,7 +217,7 @@ module "datadog" {
   environment = [
     {
       name  = "DD_API_KEY"
-      value = "{${var.datadog_api_key}}"
+      value = "${var.datadog_api_key}"
     },
     {
       name  = "ECS_FARGATE"
