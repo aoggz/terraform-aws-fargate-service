@@ -188,8 +188,8 @@ module "xray" {
 module "datadog" {
   source = "mongodb/ecs-task-definition/aws"
 
-  name                     = "datadog-agent"
-  family                   = "datadog-agent"
+  name                     = "datadog_agent"
+  family                   = "web"
   cpu                      = "${var.datadog_cpu}"
   image                    = "datadog/agent:latest"
   memory                   = "${var.datadog_memory}"
