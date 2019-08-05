@@ -222,6 +222,30 @@ module "reverse_proxy" {
       name  = "PROXY_ADDRESS"
       value = "127.0.0.1"
     },
+    {
+      name  = "COUNTRY"
+      value = "${var.reverse_proxy_cert_country}"
+    },
+    {
+      name  = "STATE"
+      value = "${var.reverse_proxy_cert_state}"
+    },
+    {
+      name  = "LOCALITY"
+      value = "${var.reverse_proxy_cert_locality}"
+    },
+    {
+      name  = "ORGANIZATION"
+      value = "${var.reverse_proxy_cert_organization}"
+    },
+    {
+      name  = "ORGANIZATIONAL_UNIT"
+      value = "${var.reverse_proxy_cert_organizational_unit}"
+    },
+    {
+      name  = "EMAIL_ADDRESS"
+      value = "${var.reverse_proxy_cert_email_address}"
+    },
   ]
 }
 
