@@ -8,6 +8,21 @@ variable "acm_certificate_domain" {
   description = "The domain of the certificate to be registered with the ALB listener"
 }
 
+variable "datadog_api_key" {
+  type        = "string"
+  description = "API key for DataDog service"
+}
+
+variable "datadog_memory" {
+  type    = "string"
+  default = "128"
+}
+
+variable "datadog_cpu" {
+  type    = "string"
+  default = "64"
+}
+
 variable "ecs_cluster_id" {
   type = "string"
 }
@@ -70,7 +85,7 @@ variable "xray_cpu" {
 
 variable "web_cpu" {
   type    = "string"
-  default = "128"
+  default = "64"
 }
 
 variable "reverse_proxy_cpu" {
@@ -121,7 +136,7 @@ variable "xray_memory" {
 
 variable "web_memory" {
   type    = "string"
-  default = "256"
+  default = "128"
 }
 
 variable "web_container_definition" {
