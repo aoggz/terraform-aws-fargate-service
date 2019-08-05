@@ -217,7 +217,7 @@ module "datadog" {
   environment = [
     {
       name  = "DD_API_KEY"
-      value = "{${aws_ssm_parameter.datadog_api_key.id}}"
+      value = "{${var.datadog_api_key}}"
     },
     {
       name  = "ECS_FARGATE"
