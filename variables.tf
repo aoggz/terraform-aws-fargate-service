@@ -13,6 +13,12 @@ variable "datadog_api_key" {
   description = "API key for DataDog service"
 }
 
+variable "datadog_enabled" {
+  type        = "string"
+  description = "Bit indicating whether DataDog agent will be deployed with Fargate task"
+  default     = "0"
+}
+
 variable "datadog_memory" {
   type    = "string"
   default = "128"
