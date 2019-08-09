@@ -6,7 +6,7 @@
 
 module "notify-slack" {
   source  = "terraform-aws-modules/notify-slack/aws"
-  version = "1.10.0"
+  version = "2.0.0"
   create  = "${var.enable_monitoring}"
 
   lambda_function_name = "${replace("${var.resource_prefix}-${terraform.workspace}-cloudwatch-events-forwarder", "/(.{0,64})(.*)/", "$1")}" # 64 character max-length
