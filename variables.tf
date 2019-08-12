@@ -45,6 +45,7 @@ variable "web_version" {
 variable "reverse_proxy_version" {
   type        = "string"
   description = "Tag of reverse_proxy Docker image that will be used to pull from GitLab and push to ECR. Incrementing this will trigger a docker push to the ECR repository."
+  default     = "v1.9.1.0-prod"
 }
 
 variable "log_retention_in_days" {
@@ -100,6 +101,16 @@ variable "reverse_proxy_memory" {
 variable "task_count" {
   type    = "string"
   default = 1
+}
+
+################
+## ALB        ##
+################
+
+variable "alb_enabled" {
+  type        = "string"
+  default     = 0
+  description = "Boolean field indicating whether or not ALB should be provisioned."
 }
 
 variable "alb_internal" {

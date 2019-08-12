@@ -7,6 +7,8 @@ resource "aws_ecr_repository" "reverse_proxy" {
 }
 
 resource "aws_security_group" "lb" {
+  # count = "${var.alb_enabled}"
+
   name        = "${var.resource_prefix}-lb-${terraform.workspace}"
   description = "LB for ${var.resource_prefix} - ${terraform.workspace}"
   vpc_id      = "${var.vpc_id}"
@@ -17,6 +19,8 @@ resource "aws_security_group" "lb" {
 }
 
 resource "aws_security_group_rule" "lb_ingress" {
+  # count = "${var.alb_enabled}"
+
   security_group_id = "${aws_security_group.lb.id}"
   type              = "ingress"
   protocol          = "TCP"
@@ -27,6 +31,8 @@ resource "aws_security_group_rule" "lb_ingress" {
 
 # Need to leave it open to allow it to talk to Cognito (for authentication) & ECS control plane
 resource "aws_security_group_rule" "lb_egress" {
+  # count = "${var.alb_enabled}"
+
   security_group_id        = "${aws_security_group.lb.id}"
   type                     = "egress"
   protocol                 = "TCP"
@@ -36,6 +42,8 @@ resource "aws_security_group_rule" "lb_egress" {
 }
 
 resource "aws_lb" "main" {
+  # count = "${var.alb_enabled}"
+
   name               = "${replace("${var.resource_prefix}-${terraform.workspace}", "/(.{0,32})(.*)/", "$1")}" # 32 character max-length
   load_balancer_type = "application"
   internal           = "${var.alb_internal == "1"}"
@@ -45,6 +53,8 @@ resource "aws_lb" "main" {
 }
 
 resource "aws_lb_target_group" "app" {
+  # count = "${var.alb_enabled}"
+
   name        = "${replace("${var.resource_prefix}-${terraform.workspace}", "/(.{0,32})(.*)/", "$1")}" # 32 character max-length
   port        = "${var.app_port}"
   protocol    = "HTTPS"
@@ -59,6 +69,8 @@ resource "aws_lb_target_group" "app" {
 }
 
 resource "aws_lb_listener" "front_end" {
+  # count = "${var.alb_enabled}"
+
   load_balancer_arn = "${aws_lb.main.id}"
   port              = "${var.app_port}"
   protocol          = "HTTPS"
@@ -116,15 +128,15 @@ resource "aws_ecs_service" "main" {
     subnets         = ["${var.alb_subnets_private}"]
   }
 
-  load_balancer {
-    target_group_arn = "${aws_lb_target_group.app.id}"
-    container_name   = "reverse_proxy"
-    container_port   = "${var.app_port}"
-  }
+  # load_balancer {
+  #   target_group_arn = "${aws_lb_target_group.app.id}"
+  #   container_name   = "reverse_proxy"
+  #   container_port   = "${var.app_port}"
+  # }
 
-  depends_on = [
-    "aws_lb_listener.front_end",
-  ]
+  # depends_on = [
+  #   "aws_lb_listener.front_end",
+  # ]
 }
 
 resource "aws_security_group" "ecs_task" {
@@ -138,12 +150,14 @@ resource "aws_security_group" "ecs_task" {
 }
 
 resource "aws_security_group_rule" "ecs_task_ingress" {
-  security_group_id        = "${aws_security_group.ecs_task.id}"
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = "${var.app_port}"
-  to_port                  = "${var.app_port}"
-  source_security_group_id = "${aws_security_group.lb.id}"
+  security_group_id = "${aws_security_group.ecs_task.id}"
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = "${var.app_port}"
+  to_port           = "${var.app_port}"
+
+  # source_security_group_id = "${aws_security_group.lb.id}"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 # Need to leave it open to allow it to talk to Cognito (for authentication) & ECS control plane
@@ -170,6 +184,7 @@ module "xray" {
   portMappings = [
     {
       containerPort = 2000
+      hostPort      = 2000
       protocol      = "udp"
     },
   ]
@@ -188,18 +203,42 @@ module "xray" {
 module "reverse_proxy" {
   source = "mongodb/ecs-task-definition/aws"
 
-  name                     = "reverse_proxy"
+  name                     = "${local.proxy_container_name}"
   family                   = "web"
   cpu                      = "${var.reverse_proxy_cpu}"
-  image                    = "aoggz/nginx-reverse-proxy:${var.reverse_proxy_version}"
+  image                    = "111345817488.dkr.ecr.us-west-2.amazonaws.com/aws-appmesh-envoy:${var.reverse_proxy_version}"
   memory                   = "${var.reverse_proxy_memory}"
   essential                = true
   register_task_definition = false
+  user                     = "1337"
+
+  ulimits = [
+    {
+      name      = "nofile"
+      hardLimit = "15000"
+      softLimit = "15000"
+    },
+  ]
 
   portMappings = [
     {
       containerPort = "${var.app_port}"
       hostPort      = "${var.app_port}"
+    },
+    {
+      containerPort = 9901
+      hostPort      = 9901
+      protocol      = "tcp"
+    },
+    {
+      containerPort = 15000
+      hostPort      = 15000
+      protocol      = "tcp"
+    },
+    {
+      containerPort = 15001
+      hostPort      = 15001
+      protocol      = "tcp"
     },
   ]
 
@@ -213,14 +252,33 @@ module "reverse_proxy" {
     }
   }
 
+  healthCheck {
+    interval = 5
+    timeout  = 2
+    retries  = 3
+
+    command = [
+      "CMD-SHELL",
+      "curl -s http://localhost:9901/server_info | grep state | grep -q LIVE",
+    ]
+  }
+
   environment = [
     {
-      name  = "DOMAIN"
-      value = "${var.app_domain}"
+      name  = "APPMESH_VIRTUAL_NODE_NAME"
+      value = "mesh/zoll-wcd-web-external/virtualNode/${aws_appmesh_virtual_node.node.name}"
     },
     {
-      name  = "PROXY_ADDRESS"
-      value = "127.0.0.1"
+      name  = "ENVOY_LOG_LEVEL"
+      value = "debug"
+    },
+    {
+      name  = "ENABLE_ENVOY_XRAY_TRACING"
+      value = "1"
+    },
+    {
+      name  = "ENABLE_ENVOY_STATS_TAGS"
+      value = "1"
     },
   ]
 }
@@ -244,6 +302,20 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions    = "${module.merged.container_definitions}"
   execution_role_arn       = "${aws_iam_role.execution.arn}"
   task_role_arn            = "${aws_iam_role.task.arn}"
+
+  proxy_configuration {
+    type           = "APPMESH"
+    container_name = "${local.proxy_container_name}"
+
+    properties = {
+      AppPorts           = "${var.app_port}"
+      EgressIgnoredIPs   = "169.254.170.2,169.254.169.254"
+      EgressIgnoredPorts = "1433"
+      IgnoredUID         = "1337"
+      ProxyEgressPort    = 15001
+      ProxyIngressPort   = 15000
+    }
+  }
 }
 
 resource "aws_cloudwatch_log_group" "main" {
