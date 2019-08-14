@@ -206,54 +206,6 @@ module "xray" {
   }
 }
 
-module "datadog" {
-  source = "mongodb/ecs-task-definition/aws"
-
-  name                     = "datadog_agent"
-  family                   = "web"
-  cpu                      = "${var.datadog_cpu}"
-  image                    = "datadog/agent:latest"
-  memory                   = "${var.datadog_memory}"
-  essential                = false
-  register_task_definition = false
-
-  portMappings = [
-    {
-      protocol      = "tcp"
-      containerPort = 8126
-    },
-  ]
-
-  logConfiguration {
-    logDriver = "awslogs"
-
-    options {
-      awslogs-region        = "${data.aws_region.current.name}"
-      awslogs-group         = "${aws_cloudwatch_log_group.main.name}"
-      awslogs-stream-prefix = "datadog"
-    }
-  }
-
-  environment = [
-    {
-      name  = "DD_API_KEY"
-      value = "${var.datadog_api_key}"
-    },
-    {
-      name  = "ECS_FARGATE"
-      value = "true"
-    },
-    {
-      name  = "DD_APM_ENABLED"
-      value = "true"
-    },
-    {
-      name  = "DD_PROCESS_AGENT_ENABLED"
-      value = "true"
-    },
-  ]
-}
-
 module "reverse_proxy" {
   source = "mongodb/ecs-task-definition/aws"
 
@@ -325,17 +277,6 @@ module "merged" {
     "${var.web_container_definition}",
     "${module.xray.container_definitions}",
     "${module.reverse_proxy.container_definitions}",
-    "${module.datadog.container_definitions}",
-  ]
-}
-
-module "merged_without_datadog" {
-  source = "mongodb/ecs-task-definition/aws//modules/merge"
-
-  container_definitions = [
-    "${var.web_container_definition}",
-    "${module.xray.container_definitions}",
-    "${module.reverse_proxy.container_definitions}",
   ]
 }
 
@@ -343,9 +284,9 @@ resource "aws_ecs_task_definition" "app" {
   family                   = "${var.resource_prefix}-${terraform.workspace}"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "${var.xray_cpu + var.web_cpu + var.reverse_proxy_cpu + local.datadog_cpu}"
-  memory                   = "${var.xray_memory + var.web_memory + var.reverse_proxy_memory + local.datadog_memory}"
-  container_definitions    = "${var.datadog_enabled == "1" ? module.merged.container_definitions : module.merged_without_datadog.container_definitions}"
+  cpu                      = "${var.xray_cpu + var.web_cpu + var.reverse_proxy_cpu}"
+  memory                   = "${var.xray_memory + var.web_memory + var.reverse_proxy_memory}"
+  container_definitions    = "${module.merged.container_definitions}"
   execution_role_arn       = "${aws_iam_role.execution.arn}"
   task_role_arn            = "${aws_iam_role.task.arn}"
 }
