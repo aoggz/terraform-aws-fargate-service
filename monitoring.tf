@@ -20,7 +20,7 @@ module "notify-slack" {
 
 module "alb-target-group-cloudwatch-sns-alarms" {
   source  = "cloudposse/alb-target-group-cloudwatch-sns-alarms/aws"
-  version = "0.5.1"
+  version = "0.6.1"
 
   enabled = "${var.enable_monitoring == "1" ? true : false}"
 
