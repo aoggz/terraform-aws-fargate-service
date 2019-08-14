@@ -24,7 +24,7 @@ output "load_balancer_zone_id" {
 }
 
 output "load_balancer_listener_arn" {
-  value       = "${local.alb_listener_arn}"
+  value       = "${var.alb_listener_default_action == "forward" ? aws_lb_listener.front_end_forward.0.arn : aws_lb_listener.front_end_redirect.0.arn}"
   description = "ARN of load balancer listener"
 }
 
