@@ -164,6 +164,12 @@ variable "alb_internal" {
   default = 1
 }
 
+variable "alb_listener_default_action" {
+  type        = "string"
+  default     = "forward"
+  description = "Only forward and redirect are currently supported"
+}
+
 variable "alb_allowed_ingress_cidr_blocks" {
   type        = "list"
   default     = ["10.0.0.0/8"]
@@ -184,6 +190,26 @@ variable "alb_subnets_private" {
 variable "alb_subnets_public" {
   type        = "list"
   description = "List of Ids of subnets in which load balancer will be hosted if alb_internal = false"
+}
+
+variable "alb_listener_default_redirect_host" {
+  type        = "string"
+  description = "Host to which request will be redirected (only used if alb_listener_default_action is redirect)"
+}
+
+variable "alb_listener_default_redirect_port" {
+  type        = "string"
+  description = "Port used when redirecting request from ALB (only used if alb_listener_default_action is redirect)"
+}
+
+variable "alb_listener_default_redirect_protocol" {
+  type        = "string"
+  description = "Protocol used when redirecting request from ALB (only used if alb_listener_default_action is redirect)"
+}
+
+variable "alb_listener_default_redirect_status_code" {
+  type        = "string"
+  description = "Status code used when redirecting request from ALB (only used if alb_listener_default_action is redirect)"
 }
 
 variable "vpc_id" {

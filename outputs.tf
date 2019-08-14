@@ -24,7 +24,7 @@ output "load_balancer_zone_id" {
 }
 
 output "load_balancer_listener_arn" {
-  value       = "${aws_lb_listener.front_end.arn}"
+  value       = "${local.alb_listener_arn}"
   description = "ARN of load balancer listener"
 }
 

@@ -58,7 +58,8 @@ resource "aws_lb_target_group" "app" {
   }
 }
 
-resource "aws_lb_listener" "front_end" {
+resource "aws_lb_listener" "front_end_forward" {
+  count             = "${var.alb_listener_default_action == "forward" ? 1 : 0}"
   load_balancer_arn = "${aws_lb.main.id}"
   port              = "${var.app_port}"
   protocol          = "HTTPS"
@@ -68,6 +69,26 @@ resource "aws_lb_listener" "front_end" {
   default_action {
     target_group_arn = "${var.alb_default_target_group_arn == "" ? aws_lb_target_group.app.id : var.alb_default_target_group_arn}"
     type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "front_end_redirect" {
+  count             = "${var.alb_listener_default_action == "redirect" ? 1 : 0}"
+  load_balancer_arn = "${aws_lb.main.id}"
+  port              = "${var.app_port}"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "${data.aws_acm_certificate.main.arn}"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      host        = "${var.alb_listener_default_redirect_host}"
+      port        = "${var.alb_listener_default_redirect_port}"
+      protocol    = "${var.alb_listener_default_redirect_protocol}"
+      status_code = "${var.alb_listener_default_redirect_status_code}"
+    }
   }
 }
 
