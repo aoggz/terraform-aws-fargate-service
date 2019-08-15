@@ -148,14 +148,20 @@ variable "task_count" {
   default = 1
 }
 
+variable "app_mesh_name" {
+  type        = string
+  description = "Name of AWS App Mesh to which ECS task will belong"
+}
+
+
 ################
 ## ALB        ##
 ################
 
 variable "alb_enabled" {
-  type        = "string"
-  default     = 0
-  description = "Boolean field indicating whether or not ALB should be provisioned."
+  type        = bool
+  default     = false
+  description = "Whether or not ALB should be provisioned."
 }
 
 variable "alb_internal" {
