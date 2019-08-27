@@ -42,7 +42,7 @@ resource "aws_lb" "main" {
     "$1",
   ) # 32 character max-length
   load_balancer_type = "application"
-  internal           = var.alb_internal == "1"
+  internal           = var.alb_internal
   subnets            = local.alb_subnets
   security_groups    = [aws_security_group.lb.id]
 }
