@@ -77,7 +77,7 @@ variable "xray_cpu" {
 
 variable "web_cpu" {
   type    = string
-  default = "64"
+  default = "128"
 }
 
 variable "reverse_proxy_cpu" {
@@ -128,7 +128,7 @@ variable "xray_memory" {
 
 variable "web_memory" {
   type    = string
-  default = "128"
+  default = "256"
 }
 
 variable "web_environment_variables" {
