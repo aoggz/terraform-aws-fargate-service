@@ -80,7 +80,7 @@ locals {
           "value": "${var.reverse_proxy_cert_email_address}"
         },
         {
-          "name": "TIMEOUT_SECONDS".
+          "name": "TIMEOUT_SECONDS",
           "value": "${var.reverse_proxy_timeout}"
         }
       ]
