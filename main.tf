@@ -90,6 +90,7 @@ resource "aws_lb_listener" "front_end" {
         port        = var.alb_listener_default_redirect_port
         path        = var.alb_listener_default_redirect_path
         protocol    = var.alb_listener_default_redirect_protocol
+        query       = var.alb_listener_default_redirect_query
         status_code = var.alb_listener_default_redirect_status_code
       }
     }

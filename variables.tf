@@ -211,6 +211,12 @@ variable "alb_listener_default_redirect_protocol" {
   default     = "#{protocol}"
 }
 
+variable "alb_listener_default_redirect_query" {
+  type        = string
+  description = "The query parameters, URL-encoded when necessary, but not percent-encoded. Do not include the leading "?" (only used if alb_listener_default_action is redirect)"
+  default     = "#{query}"
+}
+
 variable "alb_listener_default_redirect_status_code" {
   type        = string
   description = "Status code used when redirecting request from ALB (only used if alb_listener_default_action is redirect)"
