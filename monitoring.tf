@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "httpcode_target_5xx_count" {
   statistic                 = "Sum"
   threshold                 = 5
   treat_missing_data        = "notBreaching"
-  alarm_description         = "${format("${var.resource_prefix}-${terraform.workspace}", "5XX", 5, var.monitoring_period / 60, var.monitoring_evaluation_periods)}"
+  alarm_description         = "${var.resource_prefix}-${terraform.workspace}-5XX-target-group-errors"
   alarm_actions             = [module.notify-slack.this_slack_topic_arn]
   ok_actions                = [module.notify-slack.this_slack_topic_arn]
   insufficient_data_actions = [module.notify-slack.this_slack_topic_arn]
