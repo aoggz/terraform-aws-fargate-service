@@ -47,6 +47,7 @@ module "notify-slack" {
 
 
 resource "aws_cloudwatch_metric_alarm" "httpcode_target_5xx_count" {
+  count                     = var.enable_monitoring ? 1 : 0;
   alarm_name                = "${var.resource_prefix}-${terraform.workspace}-5XX-target-group-errors"
   comparison_operator       = "GreaterThanThreshold"
   evaluation_periods        = var.monitoring_evaluation_periods
