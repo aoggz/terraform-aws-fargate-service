@@ -76,9 +76,8 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count" {
   metric_name               = "UnHealthyHostCount"
   namespace                 = "AWS/ApplicationELB"
   period                    = var.monitoring_period
-  statistic                 = "Sum"
+  statistic                 = "Average"
   threshold                 = 0
-  treat_missing_data        = "notBreaching"
   alarm_description         = "${var.resource_prefix}-${terraform.workspace}-unhealthy-hosts"
   alarm_actions             = [module.notify-slack.this_slack_topic_arn]
   ok_actions                = [module.notify-slack.this_slack_topic_arn]

@@ -16,8 +16,8 @@ output "load_balancer_arn" {
 }
 
 output "load_balancer_arn_suffix" {
-  value       = aws_lb.main.id
-  description = "ARN of load balancer"
+  value       = aws_lb.main.arn_suffix
+  description = "ARN suffix of load balancer"
 }
 
 output "load_balancer_dns_name" {
