@@ -29,6 +29,12 @@ variable "enable_monitoring" {
   default = false
 }
 
+variable "monitoring_evaluation_periods" {
+  type        = number
+  default     = 1
+  description = "Number of periods to evaluate for the alarm"
+}
+
 variable "monitoring_slack_webhook_url" {
   type    = string
   default = ""
@@ -37,6 +43,12 @@ variable "monitoring_slack_webhook_url" {
 variable "monitoring_slack_channel" {
   type    = string
   default = ""
+}
+
+variable "monitoring_period" {
+  type        = number
+  default     = 300
+  description = "Duration (in seconds) to evaluate for the alarm"
 }
 
 variable "web_image" {

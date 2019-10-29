@@ -22,26 +22,48 @@ module "notify-slack" {
 
 ### CloudWatch configuration
 
-module "alb-target-group-cloudwatch-sns-alarms" {
-  source  = "cloudposse/alb-target-group-cloudwatch-sns-alarms/aws"
-  version = "0.6.1"
+# module "alb-target-group-cloudwatch-sns-alarms" {
+#   source  = "cloudposse/alb-target-group-cloudwatch-sns-alarms/aws"
+#   version = "0.6.1"
 
-  enabled = var.enable_monitoring
+#   enabled = var.enable_monitoring
 
-  namespace               = var.resource_prefix
-  stage                   = terraform.workspace
-  name                    = "alb-tg-alarms"
-  notify_arns             = [module.notify-slack.this_slack_topic_arn]
-  alb_name                = aws_lb.main.name
-  alb_arn_suffix          = aws_lb.main.arn_suffix
-  target_group_name       = aws_lb_target_group.app.name
-  target_group_arn_suffix = aws_lb_target_group.app.arn_suffix
-  treat_missing_data      = "notBreaching"
-  evaluation_periods      = "3"
+#   namespace               = var.resource_prefix
+#   stage                   = terraform.workspace
+#   name                    = "alb-tg-alarms"
+#   notify_arns             = [module.notify-slack.this_slack_topic_arn]
+#   alb_name                = aws_lb.main.name
+#   alb_arn_suffix          = aws_lb.main.arn_suffix
+#   target_group_name       = aws_lb_target_group.app.name
+#   target_group_arn_suffix = aws_lb_target_group.app.arn_suffix
+#   treat_missing_data      = "notBreaching"
+#   evaluation_periods      = "3"
 
-  target_3xx_count_threshold = "-1"
-  target_5xx_count_threshold = "5"
-  target_4xx_count_threshold = "5"
-  elb_5xx_count_threshold    = "5"
+#   target_3xx_count_threshold = "-1"
+#   target_5xx_count_threshold = "5"
+#   target_4xx_count_threshold = "5"
+#   elb_5xx_count_threshold    = "5"
+# }
+
+
+resource "aws_cloudwatch_metric_alarm" "httpcode_target_5xx_count" {
+  alarm_name                = "${var.resource_prefix}-${terraform.workspace}-5XX-target-group-errors"
+  comparison_operator       = "GreaterThanThreshold"
+  evaluation_periods        = var.monitoring_evaluation_periods
+  metric_name               = "HTTPCode_Target_5XX_Count"
+  namespace                 = "AWS/ApplicationELB"
+  period                    = var.monitoring_period
+  statistic                 = "Sum"
+  threshold                 = 5
+  treat_missing_data        = "notBreaching"
+  alarm_description         = "${format("${var.resource_prefix}-${terraform.workspace}", "5XX", 5, var.monitoring_period / 60, var.monitoring_evaluation_periods)}"
+  alarm_actions             = [module.notify-slack.this_slack_topic_arn]
+  ok_actions                = [module.notify-slack.this_slack_topic_arn]
+  insufficient_data_actions = [module.notify-slack.this_slack_topic_arn]
+
+  dimensions = {
+    "TargetGroup"  = aws_lb_target_group.app.arn_suffix
+    "LoadBalancer" = aws_lb.main.arn_suffix
+  }
 }
 
