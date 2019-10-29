@@ -15,6 +15,11 @@ output "load_balancer_arn" {
   description = "ARN of load balancer"
 }
 
+output "load_balancer_arn_suffix" {
+  value       = aws_lb.main.id
+  description = "ARN of load balancer"
+}
+
 output "load_balancer_dns_name" {
   value = aws_lb.main.dns_name
 }
@@ -32,6 +37,11 @@ output "load_balancer_listener_arn" {
 output "load_balancer_target_group_arn" {
   value       = aws_lb_target_group.app.arn
   description = "ARN of load balancer target group"
+}
+
+output "monitoring_sns_topic_arn" {
+  value       = var.enable_monitoring ? module.notify-slack.this_slack_topic_arn : ""
+  description = "ARN of SNS topic that Slack forwarder lambda is listening to (only set if enable_monitoring = true)"
 }
 
 output "task_iam_role_id" {

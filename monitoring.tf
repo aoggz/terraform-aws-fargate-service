@@ -68,3 +68,24 @@ resource "aws_cloudwatch_metric_alarm" "httpcode_target_5xx_count" {
   }
 }
 
+resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count" {
+  count                     = var.enable_monitoring ? 1 : 0
+  alarm_name                = "${var.resource_prefix}-${terraform.workspace}-unhealthy-hosts"
+  comparison_operator       = "GreaterThanThreshold"
+  evaluation_periods        = var.monitoring_evaluation_periods
+  metric_name               = "UnHealthyHostCount"
+  namespace                 = "AWS/ApplicationELB"
+  period                    = var.monitoring_period
+  statistic                 = "Sum"
+  threshold                 = 0
+  treat_missing_data        = "notBreaching"
+  alarm_description         = "${var.resource_prefix}-${terraform.workspace}-unhealthy-hosts"
+  alarm_actions             = [module.notify-slack.this_slack_topic_arn]
+  ok_actions                = [module.notify-slack.this_slack_topic_arn]
+  insufficient_data_actions = [module.notify-slack.this_slack_topic_arn]
+
+  dimensions = {
+    "TargetGroup"  = aws_lb_target_group.app.arn_suffix
+    "LoadBalancer" = aws_lb.main.arn_suffix
+  }
+}
