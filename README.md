@@ -7,7 +7,6 @@ It will create the following:
 - Application Load Balancer in the subnets you specify:
   - `alb_subnets_private` if `alb_internal = true`
   - `alb_subnets_public` if `alb_internal = false`
-- ECR Repositories for `web` and `reverse_proxy` images
 - ECS service
   - Belongs of the cluster specified by `ecs_cluster_id`
   - Creates tasks in the subnets specified in `alb_subnets_private`
