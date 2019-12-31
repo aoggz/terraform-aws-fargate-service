@@ -1,14 +1,3 @@
-# AWS Task 
-# ALB ID
-
-output "web_ecr_repository_url" {
-  value       = aws_ecr_repository.web.repository_url
-  description = "URL of ECR Repository for web Docker image"
-}
-
-output "cloudwatch_log_group_name" {
-  value = aws_cloudwatch_log_group.main.name
-}
 
 output "load_balancer_arn" {
   value       = aws_lb.main.id
@@ -42,11 +31,6 @@ output "load_balancer_target_group_arn" {
 output "monitoring_sns_topic_arn" {
   value       = var.enable_monitoring ? module.notify-slack.this_slack_topic_arn : ""
   description = "ARN of SNS topic that Slack forwarder lambda is listening to (only set if enable_monitoring = true)"
-}
-
-output "task_iam_role_id" {
-  value       = aws_iam_role.task.id
-  description = "Id of IAM role that ECS task will assume"
 }
 
 output "task_security_group_id" {
