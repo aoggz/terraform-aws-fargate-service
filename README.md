@@ -21,10 +21,11 @@ It will create the following:
 ```hcl
 module "cool-module-name-here" {
   source  = "aoggz/fargate-service/aws"
-  version = "2.0.0"
+  version = "3.0.0"
 
   resource_prefix                           = local.resource_prefix
   ecs_cluster_id                            = var.ecs_cluster_id
+  ecs_task_definition_arn                   = module.ecs_task.task_definition_arn
   acm_certificate_domain                    = var.acm_certificate_domain
   log_retention_in_days                     = 30
   app_domain                                = var.app_domain              # must be a subdomain of the acm_certificate_domain
