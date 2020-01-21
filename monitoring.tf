@@ -9,15 +9,11 @@ module "notify-slack" {
   version = "~> 2.0"
   create  = var.enable_monitoring
 
-  lambda_function_name = replace(
-    "${var.resource_prefix}-${terraform.workspace}-cloudwatch-events-forwarder",
-    "/(.{0,64})(.*)/",
-    "$1",
-  ) # 64 character max-length
-  sns_topic_name    = "${var.resource_prefix}-${terraform.workspace}-cloudwatch-events"
-  slack_webhook_url = var.monitoring_slack_webhook_url
-  slack_channel     = var.monitoring_slack_channel
-  slack_username    = "Amazon CloudWatch"
+  lambda_function_name = trim(substr("${var.resource_prefix}-${terraform.workspace}-cloudwatch-events-forwarder", 0, 64), "-") # 64 character max-length
+  sns_topic_name       = "${var.resource_prefix}-${terraform.workspace}-cloudwatch-events"
+  slack_webhook_url    = var.monitoring_slack_webhook_url
+  slack_channel        = var.monitoring_slack_channel
+  slack_username       = "Amazon CloudWatch"
 }
 
 ### CloudWatch configuration

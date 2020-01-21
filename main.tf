@@ -29,11 +29,7 @@ resource "aws_security_group_rule" "lb_egress" {
 }
 
 resource "aws_lb" "main" {
-  name = replace(
-    "${var.resource_prefix}-${terraform.workspace}",
-    "/(.{0,32})(.*)/",
-    "$1",
-  ) # 32 character max-length
+  name               = trim(substr("${var.resource_prefix}-${terraform.workspace}", 0, 32), "-") # 32 character max-length
   load_balancer_type = "application"
   internal           = var.alb_internal
   subnets            = local.alb_subnets
@@ -41,11 +37,7 @@ resource "aws_lb" "main" {
 }
 
 resource "aws_lb_target_group" "app" {
-  name = replace(
-    "${var.resource_prefix}-${terraform.workspace}",
-    "/(.{0,32})(.*)/",
-    "$1",
-  ) # 32 character max-length
+  name        = trim(substr("${var.resource_prefix}-${terraform.workspace}", 0, 32), "-") # 32 character max-length
   port        = var.app_port
   protocol    = "HTTPS"
   vpc_id      = var.vpc_id
