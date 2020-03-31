@@ -161,3 +161,63 @@ variable "app_healthcheck_endpoint" {
   default     = "/health-check"
   description = "[Optional] Endpoint that the Application Load Balancer will use to ensure a task is healthy. Defaults to /health-check"
 }
+
+variable "enable_autoscale" {
+  type        = bool
+  default     = false
+  description = "[Optional] Autoscale - enables autoscaling for ecs tasks"
+}
+
+variable "task_max_instance_count" {
+  type        = string
+  default     = 2
+  description = "[Optional] Autoscale - max task count used for autoscaling"
+}
+
+variable "task_scale_out_memory_threshold_percent" {
+  type        = number
+  default     = 50
+  description = "[Optional] Autoscale - When average memory utilization % is greater than or equal to value increase tasks by 1"
+}
+
+variable "task_scale_out_cpu_threshold_percent" {
+  type        = number
+  default     = 60
+  description = "[Optional] Autoscale - When average cpu utilization % is greater than or equal to value increase tasks by 1"
+}
+
+variable "task_scale_in_memory_threshold_percent" {
+  type = number
+  default = 25
+  description= "[Optional] Autoscale - When both cpu and memory are below scale in thresholds decrease tasks by 1"
+}
+
+variable "task_scale_in_cpu_threshold_percent" {
+  type = number
+  default = 30
+  description= "[Optional] Autoscale - When both cpu and memory are below scale in thresholds decrease tasks by 1"
+}
+
+variable "task_scale_in_cooldown_period" {
+  type = number
+  default = 300
+  description = "[Optional] Autoscale - scale in cooldown period, in seconds"
+}
+
+variable "task_scale_out_cooldown_period" {
+  type = number
+  default = 300
+  description = "[Optional] Autoscale - scale out cooldown period, in seconds"
+}
+
+variable "task_scale_in_alarm_evaluation_period" {
+  type = number
+  default = 60
+  description = "[Optional] Autoscale - scale in alarm evaluation period, in seconds"
+}
+
+variable "task_scale_out_alarm_evaluation_period" {
+  type = number
+  default = 60
+  description = "[Optional] Autoscale - scale out alarm evaluation period, in seconds"
+}
