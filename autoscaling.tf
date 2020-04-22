@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_or_cpu_high" {
   count               = var.enable_autoscale ? 1 : 0
   alarm_name          = "${aws_ecs_service.main.name}-Memory-${var.task_scale_out_memory_threshold_percent}-OR-CPU-${var.task_scale_out_cpu_threshold_percent}-High"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "1"
+  evaluation_periods  = var.task_alarm_evaluation_periods
   threshold           = "1"
   alarm_description   = "Scale out ${aws_ecs_service.main.name} tasks"
  
@@ -32,7 +32,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_or_cpu_high" {
     metric {
       metric_name = "CPUUtilization"
       namespace   = "AWS/ECS"
-      period      = var.task_scale_out_alarm_evaluation_period
+      period      = var.task_alarm_period
       stat        = "Average"
       unit        = "Percent"
  
@@ -49,7 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_or_cpu_high" {
     metric {
       metric_name = "MemoryUtilization"
       namespace   = "AWS/ECS"
-      period      = var.task_scale_out_alarm_evaluation_period
+      period      = var.task_alarm_period
       stat        = "Average"
       unit        = "Percent"
  
@@ -71,13 +71,13 @@ resource "aws_cloudwatch_metric_alarm" "memory_and_cpu_low" {
   count              = var.enable_autoscale ? 1 : 0
   alarm_name          = "${aws_ecs_service.main.name}-Memory-${var.task_scale_in_memory_threshold_percent}-AND-CPU-${var.task_scale_in_cpu_threshold_percent}-Low"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = "1"
+  evaluation_periods  = var.task_alarm_evaluation_periods
   threshold           = "1"
   alarm_description   = "Scale in ${aws_ecs_service.main.name} tasks"
  
   metric_query {
     id          = "e1"
-    expression  = "CEIL((cpu-${var.task_scale_in_cpu_threshold_percent})/(100))+CEIL((memory-${var.task_scale_in_memory_threshold_percent})/(100))"
+    expression  = "CEIL((cpu-${var.task_scale_in_cpu_threshold_percent})/(100))+CEIL((memory-${var.task_scale_in_memory_threshold_percent})/(100))+((${var.task_count}+1)-healthyhosts)"
     label       = "CPU and Memory Utilization low"
     return_data = "true"
   }
@@ -88,7 +88,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_and_cpu_low" {
     metric {
       metric_name = "CPUUtilization"
       namespace   = "AWS/ECS"
-      period      = var.task_scale_in_alarm_evaluation_period
+      period      = var.task_alarm_period
       stat        = "Average"
       unit        = "Percent"
  
@@ -105,13 +105,29 @@ resource "aws_cloudwatch_metric_alarm" "memory_and_cpu_low" {
     metric {
       metric_name = "MemoryUtilization"
       namespace   = "AWS/ECS"
-      period      = var.task_scale_in_alarm_evaluation_period
+      period      = var.task_alarm_period
       stat        = "Average"
       unit        = "Percent"
  
       dimensions = {
         ClusterName = var.ecs_cluster_name
         ServiceName = aws_ecs_service.main.name
+      }
+    }
+  }
+
+  metric_query {
+    id = "healthyhosts"
+ 
+    metric {
+      metric_name = "HealthyHostCount"
+      namespace   = "AWS/ApplicationELB"
+      period      = var.task_alarm_period
+      stat        = "Average"
+ 
+      dimensions = {
+        TargetGroup = aws_lb_target_group.app.arn_suffix
+        LoadBalancer = aws_lb.main.arn_suffix
       }
     }
   }

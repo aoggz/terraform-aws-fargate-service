@@ -56,7 +56,6 @@ resource "aws_cloudwatch_metric_alarm" "httpcode_target_5xx_count" {
   alarm_description         = "${var.resource_prefix}-${terraform.workspace}-5XX-target-group-errors"
   alarm_actions             = [module.notify-slack.this_slack_topic_arn]
   ok_actions                = [module.notify-slack.this_slack_topic_arn]
-  insufficient_data_actions = [module.notify-slack.this_slack_topic_arn]
 
   dimensions = {
     "TargetGroup"  = aws_lb_target_group.app.arn_suffix
@@ -74,10 +73,10 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_host_count" {
   period                    = var.monitoring_period
   statistic                 = "Average"
   threshold                 = 0
+  treat_missing_data        = "notBreaching"
   alarm_description         = "${var.resource_prefix}-${terraform.workspace}-unhealthy-hosts"
   alarm_actions             = [module.notify-slack.this_slack_topic_arn]
   ok_actions                = [module.notify-slack.this_slack_topic_arn]
-  insufficient_data_actions = [module.notify-slack.this_slack_topic_arn]
 
   dimensions = {
     "TargetGroup"  = aws_lb_target_group.app.arn_suffix

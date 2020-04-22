@@ -42,6 +42,7 @@ resource "aws_lb_target_group" "app" {
   protocol    = "HTTPS"
   vpc_id      = var.vpc_id
   target_type = "ip"
+  slow_start  = var.target_group_slow_start
 
   health_check {
     path     = var.app_healthcheck_endpoint
