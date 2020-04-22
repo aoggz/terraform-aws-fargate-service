@@ -189,35 +189,41 @@ variable "task_scale_out_cpu_threshold_percent" {
 variable "task_scale_in_memory_threshold_percent" {
   type = number
   default = 25
-  description= "[Optional] Autoscale - When both cpu and memory are below scale in thresholds decrease tasks by 1"
+  description= "[Optional] Autoscale - When both cpu and memory are below scale in thresholds decrease tasks by 1. Only applies when the total number of tasks exceed the minimum task count. number of running tasks determined by HealthyHostCount."
 }
 
 variable "task_scale_in_cpu_threshold_percent" {
-  type = number
-  default = 30
-  description= "[Optional] Autoscale - When both cpu and memory are below scale in thresholds decrease tasks by 1"
+  type        = number
+  default     = 30
+  description = "[Optional] Autoscale - When both cpu and memory are below scale in thresholds decrease tasks by 1. Only applies when the total number of tasks exceed the minimum task count. number of running tasks determined by HealthyHostCount."
 }
 
 variable "task_scale_in_cooldown_period" {
-  type = number
-  default = 300
+  type        = number
+  default     = 300
   description = "[Optional] Autoscale - scale in cooldown period, in seconds"
 }
 
 variable "task_scale_out_cooldown_period" {
-  type = number
-  default = 300
+  type        = number
+  default     = 300
   description = "[Optional] Autoscale - scale out cooldown period, in seconds"
 }
 
-variable "task_scale_in_alarm_evaluation_period" {
-  type = number
-  default = 60
-  description = "[Optional] Autoscale - scale in alarm evaluation period, in seconds"
+variable "task_alarm_period" {
+  type        = number
+  default     = 60
+  description = "[Optional] Autoscale - period of time to evaluate, in seconds"
 }
 
-variable "task_scale_out_alarm_evaluation_period" {
-  type = number
-  default = 60
-  description = "[Optional] Autoscale - scale out alarm evaluation period, in seconds"
+variable "task_alarm_evaluation_periods" {
+  type        = number
+  default     = 3
+  description = "[Optional] Autoscale - number of data points to use for evaluation"
+}
+
+variable "target_group_slow_start" {
+  type        = number
+  default     = 300
+  description = "[Optional] Load balancer - time period to wait before forwarding requests to the target group, time in seconds."
 }
