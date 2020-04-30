@@ -34,6 +34,7 @@ resource "aws_lb" "main" {
   internal           = var.alb_internal
   subnets            = local.alb_subnets
   security_groups    = [aws_security_group.lb.id]
+  depends_on         = [var.service_depends_on]
 }
 
 resource "aws_lb_target_group" "app" {
