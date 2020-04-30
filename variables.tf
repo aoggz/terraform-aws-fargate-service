@@ -227,3 +227,9 @@ variable "target_group_slow_start" {
   default     = 300
   description = "[Optional] Load balancer - time period to wait before forwarding requests to the target group, time in seconds."
 }
+
+variable "service_depends_on" {
+  type        = any
+  default     = null
+  description = "[Optional] service - resources that the service depends on. Will delay deployment of service until resources available"
+}
